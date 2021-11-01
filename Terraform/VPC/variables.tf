@@ -48,6 +48,16 @@ variable "profileName" {
   description = "Profile name"
 }
 
+variable "accessKey" {
+  type        = string
+  description = "access Key"
+}
+
+variable "secretAccessKey" {
+  type        = string
+  description = "secretAccessKey"
+}
+
 variable "subnetGroup" {
   type        = string
   description = "RDS subnet group"
@@ -123,6 +133,7 @@ variable "apply_method" { type = string }
 
 //Variables for EC2 instance
 variable "ami" { type = string }
+variable "owners" { type = string }
 variable "instance_type" { type = string }
 variable "disable_api_termination" { type = bool }
 variable "user_data" { type = string }
@@ -139,3 +150,4 @@ variable "IAMRoleProfile" { type = string }
 variable "bucketname" { type = string }
 variable "envName" { type = string }
 variable "iam_policy_attach" { type = string }
+variable "S3_ENDPOINT" { type = string }

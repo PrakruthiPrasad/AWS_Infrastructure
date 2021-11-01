@@ -32,21 +32,21 @@ resource "aws_route_table" "public_crt" {
 
 resource "aws_route_table_association" "crta_public_subnet1" {
 
-  //depends_on = [aws_vpc.subnet1]
+  depends_on     = [aws_subnet.subnet1]
   subnet_id      = aws_subnet.subnet1.id
   route_table_id = aws_route_table.public_crt.id
 }
 
 resource "aws_route_table_association" "crta_public_subnet2" {
 
-  //depends_on = [aws_vpc.subnet2]
+  depends_on     = [aws_subnet.subnet2]
   subnet_id      = aws_subnet.subnet2.id
   route_table_id = aws_route_table.public_crt.id
 }
 
 resource "aws_route_table_association" "crta_public_subnet3" {
 
-  //depends_on = [aws_vpc.subnet3]
+  depends_on     = [aws_subnet.subnet3]
   subnet_id      = aws_subnet.subnet3.id
   route_table_id = aws_route_table.public_crt.id
 }
@@ -88,6 +88,14 @@ resource "aws_security_group" "application_security_group" {
     cidr_blocks = [var.dest_cidr_block]
   }
 
+  ingress {
+    from_port   = var.db_port
+    to_port     = var.db_port
+    protocol    = var.protocol
+    description = "PORT 3306"
+    cidr_blocks = [var.dest_cidr_block]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -111,9 +119,8 @@ resource "aws_security_group" "database_security_group" {
     from_port       = var.http_port
     to_port         = var.db_port
     protocol        = var.protocol
-    description     = "PORT 3306"
     security_groups = ["${aws_security_group.application_security_group.id}"]
-    cidr_blocks     = [var.dest_cidr_block]
+    cidr_blocks     = [var.vpc_cidr_block]
   }
 
   egress {
