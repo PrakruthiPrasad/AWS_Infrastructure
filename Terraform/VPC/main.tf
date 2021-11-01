@@ -121,7 +121,7 @@ locals {
 }
 
 resource "aws_s3_bucket" "bucket" {
-  bucket        = "${random_string.rs.id}.dev.csye6225dnsbagur.me"
+  bucket        = "${random_string.rs.id}.${var.envName}.csye6225dnsbagur.me"
   force_destroy = true
   acl           = "private"
   server_side_encryption_configuration {
@@ -168,6 +168,10 @@ resource "aws_db_instance" "rds_instance" {
   skip_final_snapshot       = var.skip_final_snapshot
   final_snapshot_identifier = var.final_snapshot_identifier
   publicly_accessible       = var.publicly_accessible
+}
+
+output "rds_endpoint" {
+  value = aws_db_instance.rds_instance.endpoint
 }
 
 //RDS parameter group
@@ -252,12 +256,13 @@ resource "aws_iam_instance_profile" "ec2_iam_role_profile" {
 resource "aws_key_pair" "key_pair" {
   key_name   = var.key_name
   public_key = file("${var.PUBLIC_KEY_PATH}")
+
 }
 
 data "aws_ami" "ami_image" {
   most_recent = true
 
-  owners = ["833782707839"]
+  owners = [var.owners]
 }
 
 
@@ -268,18 +273,6 @@ resource "aws_instance" "EC2_instance" {
   instance_type           = var.instance_type
   key_name                = aws_key_pair.key_pair.id
   disable_api_termination = var.disable_api_termination
-  user_data               = <<EOF
-        #!/bin/bash 
-        sudo apt update
-        sudo apt install unzip        
-        mkdir -p /home/ubuntu/csye6225Cloud/webapp/
-        sudo chown -R ubuntu:ubuntu home/ubuntu/csye6225Cloud
-        sudo echo "PORT = ${var.http_port}" >> /home/ubuntu/csye6225Cloud/webapp/.env      
-        sudo echo "DB_URL = mysql://${var.username}:${aws_db_instance.rds_instance.password}@${aws_db_instance.rds_instance.endpoint}/${var.database_name} "  >> /home/ubuntu/csye6225-cloud/webapp/.env
-        sudo echo "S3_BUCKET_NAME= ${aws_s3_bucket.bucket.bucket}" >> /home/ubuntu/csye6225-cloud/webapp/.env
-        cd /home/ubuntu/csye6225Cloud/webapp/ && GLOBIGNORE=*.env
-        
-        EOF
   vpc_security_group_ids  = ["${aws_security_group.application_security_group.id}"]
   iam_instance_profile    = aws_iam_instance_profile.ec2_iam_role_profile.name
 
@@ -288,6 +281,20 @@ resource "aws_instance" "EC2_instance" {
     volume_size = var.volume_size
     volume_type = var.volume_type
   }
+  user_data = <<-EOF
+              #!/bin/bash
+              sudo echo "export DB_URL=${aws_db_instance.rds_instance.endpoint}" >> /etc/environment
+              sudo echo "export DB_PORT=${var.db_port}" >> /etc/environment
+              sudo echo "export S3_BUCKET_NAME=${aws_s3_bucket.bucket.bucket}" >> /etc/environment
+              sudo echo "export DB_NAME=${aws_db_instance.rds_instance.name}" >> /etc/environment
+              sudo echo "export DB_USER=${aws_db_instance.rds_instance.username}" >> /etc/environment
+              sudo echo "export DB_PWD=${aws_db_instance.rds_instance.password}" >> /etc/environment
+              sudo echo "export S3_ENDPOINT=${var.S3_ENDPOINT}" >> /etc/environment
+              sudo echo "export REGION=${var.regionName}" >> /etc/environment
+              sudo echo "export accessKeyId=${var.accessKey}" >> /etc/environment
+              sudo echo "export secretKey=${var.secretAccessKey}" >> /etc/environment
+              EOF
+
 
   tags = {
     name = var.ec2name
