@@ -121,7 +121,7 @@ locals {
 }
 
 resource "aws_s3_bucket" "bucket" {
-  bucket        = "${random_string.rs.id}.${var.envName}.csye6225dnsbagur.me"
+  bucket        = "${random_string.rs.id}.${var.profileName}.csye6225dnsbagur.me"
   force_destroy = true
   acl           = "private"
   server_side_encryption_configuration {
@@ -263,6 +263,11 @@ data "aws_ami" "ami_image" {
   most_recent = true
 
   owners = [var.owners]
+  //  filter {
+  //   name = "name"
+  //   values = ["csye6225_1635818160"]
+    
+  // }
 }
 
 
