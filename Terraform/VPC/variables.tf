@@ -151,3 +151,4 @@ variable "bucketname" { type = string }
 variable "envName" { type = string }
 variable "iam_policy_attach" { type = string }
 variable "S3_ENDPOINT" { type = string }
+variable "route53_domain" { type = string }
