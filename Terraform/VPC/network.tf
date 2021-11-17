@@ -85,7 +85,8 @@ resource "aws_security_group" "application_security_group" {
     to_port     = var.custom_tcp_port
     protocol    = var.protocol
     description = "PORT 8080"
-    cidr_blocks = [var.dest_cidr_block]
+    //cidr_blocks = [var.dest_cidr_block]
+    security_groups = ["${aws_security_group.loadBalancer_SG.id}"]
   }
 
   ingress {

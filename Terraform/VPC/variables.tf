@@ -152,3 +152,6 @@ variable "envName" { type = string }
 variable "iam_policy_attach" { type = string }
 variable "S3_ENDPOINT" { type = string }
 variable "route53_domain" { type = string }
+
+//Variables for Cloud watch policy
+variable "cloudWatchPolicyArn" { type = string }

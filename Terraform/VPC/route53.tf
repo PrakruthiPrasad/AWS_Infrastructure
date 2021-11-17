@@ -8,8 +8,13 @@ resource "aws_route53_record" "primary_A_record" {
   name    = "${var.profileName}.${var.route53_domain}"
   type    = "A"
 
-  ttl        = "300"
-  records    = [aws_instance.EC2_instance.public_ip]
-  depends_on = [aws_instance.EC2_instance]
+  // ttl        = "300"
+  // records    = [aws_instance.EC2_instance.public_ip]
+  // depends_on = [aws_instance.EC2_instance]
+  alias {
+    name                   = aws_lb.loadBalancer.dns_name
+    zone_id                = aws_lb.loadBalancer.zone_id
+    evaluate_target_health = true
+  }
 
 }

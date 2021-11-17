@@ -247,6 +247,13 @@ resource "aws_iam_policy_attachment" "iam-policy-attach" {
   policy_arn = aws_iam_policy.WebAppS3.arn
 }
 
+// IAM policy attachment
+resource "aws_iam_policy_attachment" "cloudWatch-policy-attach" {
+  name       = "cloudWatch-policy-attachment"
+  roles      = ["${aws_iam_role.ec2_iam_role.name}"]
+  policy_arn = var.cloudWatchPolicyArn
+}
+
 // IAM instance profile
 resource "aws_iam_instance_profile" "ec2_iam_role_profile" {
   name = var.IAMRoleProfile
@@ -259,52 +266,40 @@ resource "aws_key_pair" "key_pair" {
 
 }
 
-data "aws_ami" "ami_image" {
-  most_recent = true
+// //EC2 instance
+// resource "aws_instance" "EC2_instance" {
+//   subnet_id               = aws_subnet.subnet3.id
+//   ami                     = data.aws_ami.ami_image.id
+//   instance_type           = var.instance_type
+//   key_name                = aws_key_pair.key_pair.id
+//   disable_api_termination = var.disable_api_termination
+//   vpc_security_group_ids  = ["${aws_security_group.application_security_group.id}"]
+//   iam_instance_profile    = aws_iam_instance_profile.ec2_iam_role_profile.name
 
-  owners = [var.owners]
-  //  filter {
-  //   name = "name"
-  //   values = ["csye6225_1635818160"]
-    
-  // }
-}
-
-
-//EC2 instance
-resource "aws_instance" "EC2_instance" {
-  subnet_id               = aws_subnet.subnet3.id
-  ami                     = data.aws_ami.ami_image.id
-  instance_type           = var.instance_type
-  key_name                = aws_key_pair.key_pair.id
-  disable_api_termination = var.disable_api_termination
-  vpc_security_group_ids  = ["${aws_security_group.application_security_group.id}"]
-  iam_instance_profile    = aws_iam_instance_profile.ec2_iam_role_profile.name
-
-  ebs_block_device {
-    device_name = var.device_name
-    volume_size = var.volume_size
-    volume_type = var.volume_type
-  }
-  user_data = <<-EOF
-              #!/bin/bash
-              sudo echo "export DB_URL=${aws_db_instance.rds_instance.endpoint}" >> /etc/environment
-              sudo echo "export DB_PORT=${var.db_port}" >> /etc/environment
-              sudo echo "export S3_BUCKET_NAME=${aws_s3_bucket.bucket.bucket}" >> /etc/environment
-              sudo echo "export DB_NAME=${aws_db_instance.rds_instance.name}" >> /etc/environment
-              sudo echo "export DB_USER=${aws_db_instance.rds_instance.username}" >> /etc/environment
-              sudo echo "export DB_PWD=${aws_db_instance.rds_instance.password}" >> /etc/environment
-              sudo echo "export S3_ENDPOINT=${var.S3_ENDPOINT}" >> /etc/environment
-              sudo echo "export REGION=${var.regionName}" >> /etc/environment
-              sudo echo "export accessKeyId=${var.accessKey}" >> /etc/environment
-              sudo echo "export secretKey=${var.secretAccessKey}" >> /etc/environment
-              EOF
+//   ebs_block_device {
+//     device_name = var.device_name
+//     volume_size = var.volume_size
+//     volume_type = var.volume_type
+//   }
+//   user_data = <<-EOF
+//               #!/bin/bash
+//               sudo echo "export DB_URL=${aws_db_instance.rds_instance.endpoint}" >> /etc/environment
+//               sudo echo "export DB_PORT=${var.db_port}" >> /etc/environment
+//               sudo echo "export S3_BUCKET_NAME=${aws_s3_bucket.bucket.bucket}" >> /etc/environment
+//               sudo echo "export DB_NAME=${aws_db_instance.rds_instance.name}" >> /etc/environment
+//               sudo echo "export DB_USER=${aws_db_instance.rds_instance.username}" >> /etc/environment
+//               sudo echo "export DB_PWD=${aws_db_instance.rds_instance.password}" >> /etc/environment
+//               sudo echo "export S3_ENDPOINT=${var.S3_ENDPOINT}" >> /etc/environment
+//               sudo echo "export REGION=${var.regionName}" >> /etc/environment
+//               sudo echo "export accessKeyId=${var.accessKey}" >> /etc/environment
+//               sudo echo "export secretKey=${var.secretAccessKey}" >> /etc/environment
+//               EOF
 
 
-  tags = {
-    name = var.ec2name
-  }
-}
+//   tags = {
+//     name = var.ec2name
+//   }
+// }
 
 
 
