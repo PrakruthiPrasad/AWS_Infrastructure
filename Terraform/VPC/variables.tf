@@ -63,6 +63,39 @@ variable "subnetGroup" {
   description = "RDS subnet group"
 }
 
+variable "AWS_AVAILABILITY_4" {
+  default = "us-east-1d"
+}
+
+variable "AWS_AVAILABILITY_5" {
+  default = "us-east-1e"
+}
+
+variable "readreplicasubnetgroup" {
+  type        = string
+  description = "name of RDS subnet group"
+}
+
+variable "subnet_cidr_block4" {
+  type        = string
+  description = "CIDR Block for subnet"
+}
+
+variable "subnet_cidr_block5" {
+  type        = string
+  description = "CIDR Block for subnet"
+}
+
+variable "subnet_cidr_block7" {
+  type        = string
+  description = "CIDR Block for subnet"
+}
+
+variable "subnet_cidr_block9" {
+  type        = string
+  description = "CIDR Block for subnet"
+}
+
 
 //Variables for Security group
 variable "SG_name" {
@@ -155,3 +188,20 @@ variable "route53_domain" { type = string }
 
 //Variables for Cloud watch policy
 variable "cloudWatchPolicyArn" { type = string }
+
+//Variables for lambda
+variable "lambdabucketName" {
+  description = "Bucket name for lambda"
+}
+
+variable "lambdaRoleName" {
+  description = "Role name for lambda"
+}
+
+variable "snsTopic" {
+  description = "sns topic name"
+}
+
+variable "domain" {
+  description = "domain name"
+}
