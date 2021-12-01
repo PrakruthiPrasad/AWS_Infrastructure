@@ -35,8 +35,7 @@ resource "aws_launch_configuration" "asg_launch_config" {
               sudo echo "export DB_PWD=${aws_db_instance.rds_instance.password}" >> /etc/environment
               sudo echo "export S3_ENDPOINT=${var.S3_ENDPOINT}" >> /etc/environment
               sudo echo "export REGION=${var.regionName}" >> /etc/environment
-              sudo echo "export accessKeyId=${var.accessKey}" >> /etc/environment
-              sudo echo "export secretKey=${var.secretAccessKey}" >> /etc/environment
+              sudo echo "export SSN_ARN=${aws_sns_topic.EmailNotification.arn}" >> /etc/environment
               EOF
 
 
