@@ -131,3 +131,15 @@ resource "aws_iam_role_policy_attachment" "topic_policy_attach_role" {
   depends_on = [aws_iam_role.CodeDeployAWSLambdaRole]
   policy_arn = aws_iam_policy.topic_policy.arn
 }
+
+resource "aws_iam_role_policy_attachment" "dynamoDB_policy_attach" {
+  role       = "EC2-CSYE6225"
+  depends_on = [aws_iam_role.CodeDeployAWSLambdaRole]
+  policy_arn = "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "dynamoDB_ec2_policy_attach" {
+  role       = aws_iam_role.CodeDeployAWSLambdaRole.name
+  depends_on = [aws_iam_role.ec2_iam_role]
+  policy_arn = "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+}

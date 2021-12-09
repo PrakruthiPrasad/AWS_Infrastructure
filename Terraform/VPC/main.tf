@@ -149,6 +149,12 @@ resource "aws_s3_bucket" "bucket" {
   }
 }
 
+resource "aws_kms_key" "rds_kms_key" {
+  description             = "KMS key for RDS"
+  deletion_window_in_days = 10
+  enable_key_rotation     = true
+}
+
 // RDS instance
 resource "aws_db_instance" "rds_instance" {
 
@@ -168,6 +174,10 @@ resource "aws_db_instance" "rds_instance" {
   skip_final_snapshot       = var.skip_final_snapshot
   final_snapshot_identifier = var.final_snapshot_identifier
   publicly_accessible       = var.publicly_accessible
+  availability_zone         = "us-east-1b"
+  backup_retention_period   = 1
+  kms_key_id                = aws_kms_key.rds_kms_key.arn
+  storage_encrypted         = true
 }
 
 output "rds_endpoint" {
@@ -181,17 +191,28 @@ resource "aws_db_parameter_group" "rds_parameter_group" {
   family = var.family
 
   parameter {
-    name         = var.parameter1_name
-    value        = var.value1
-    apply_method = var.apply_method
-  }
-  parameter {
-    name         = var.parameter2_name
-    value        = var.value2
-    apply_method = var.apply_method
+    name         = "max_connections"
+    value        = "500"
+    apply_method = "pending-reboot"
   }
 }
 
+resource "aws_db_instance" "rds_read_replica" {
+  name                   = "rds_Replica"
+  engine                 = var.engine
+  engine_version         = var.engine_version
+  instance_class         = var.instance_class
+  apply_immediately      = true
+  identifier             = "csye6225-replica"
+  publicly_accessible    = false
+  vpc_security_group_ids = ["${aws_security_group.database_security_group.id}"]
+  storage_encrypted      = true
+  parameter_group_name   = aws_db_parameter_group.rds_parameter_group.name
+  availability_zone      = "us-east-1c"
+  replicate_source_db    = aws_db_instance.rds_instance.id
+  skip_final_snapshot    = true
+  multi_az               = false
+}
 
 //IAM role
 resource "aws_iam_role" "ec2_iam_role" {
@@ -224,6 +245,7 @@ resource "aws_iam_policy" "WebAppS3" {
     "Version": "2012-10-17",
     "Statement": [
         {
+            "Sid": "AllowGetPutDeleteActionsOnS3Bucket",
             "Effect": "Allow",
             "Action": [
                 "s3:ListBucket",
@@ -233,7 +255,8 @@ resource "aws_iam_policy" "WebAppS3" {
                 "s3:Put*",
                 "s3:Delete*"
             ],
-            "Resource": "arn:aws:s3:::${aws_s3_bucket.bucket.bucket}"
+            "Resource": ["arn:aws:s3:::${aws_s3_bucket.bucket.bucket}","arn:aws:s3:::${aws_s3_bucket.bucket.bucket}/*"]
+           
         }
     ]
 }
