@@ -98,7 +98,7 @@ resource "aws_launch_configuration" "asg_launch_config" {
   user_data = <<-EOF
               #!/bin/bash
               sudo echo "export DB_URL=${aws_db_instance.rds_instance.endpoint}" >> /etc/environment
-              sudo echo "export DB_URL_REPLICA=${aws_db_instance.rds_read_replica.endpoint}" >> /etc/environment
+              sudo echo "export DB_URL_REPLICA=${aws_db_instance.rds_instance_Replica.endpoint}" >> /etc/environment
               sudo echo "export DB_PORT=${var.db_port}" >> /etc/environment
               sudo echo "export S3_BUCKET_NAME=${aws_s3_bucket.bucket.bucket}" >> /etc/environment
               sudo echo "export DB_NAME=${aws_db_instance.rds_instance.name}" >> /etc/environment

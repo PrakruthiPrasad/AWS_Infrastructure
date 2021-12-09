@@ -197,8 +197,8 @@ resource "aws_db_parameter_group" "rds_parameter_group" {
   }
 }
 
-resource "aws_db_instance" "rds_read_replica" {
-  name                   = "rds_Replica"
+resource "aws_db_instance" "rds_instance_Replica" {
+  name                   = "Replica"
   engine                 = var.engine
   engine_version         = var.engine_version
   instance_class         = var.instance_class
