@@ -56,28 +56,29 @@ resource "aws_security_group" "application_security_group" {
   depends_on = [aws_vpc.vpc]
   vpc_id     = aws_vpc.vpc.id
 
-  ingress {
-    from_port   = var.ssh_port
-    to_port     = var.ssh_port
-    protocol    = var.protocol
-    description = "PORT 22"
-    cidr_blocks = [var.dest_cidr_block]
-  }
+  // ingress {
+  //   from_port   = var.ssh_port
+  //   to_port     = var.ssh_port
+  //   protocol    = var.protocol
+  //   description = "PORT 22"
+  //   cidr_blocks = [var.dest_cidr_block]
+  // }
 
-  ingress {
-    from_port   = var.http_port
-    to_port     = var.http_port
-    protocol    = var.protocol
-    description = "PORT 80"
-    cidr_blocks = [var.dest_cidr_block]
-  }
+  // ingress {
+  //   from_port   = var.http_port
+  //   to_port     = var.http_port
+  //   protocol    = var.protocol
+  //   description = "PORT 80"
+  //   cidr_blocks = [var.dest_cidr_block]
+  // }
 
   ingress {
     from_port   = var.https_port
     to_port     = var.https_port
     protocol    = var.protocol
     description = "PORT 443"
-    cidr_blocks = [var.dest_cidr_block]
+    //cidr_blocks = [var.dest_cidr_block]
+    security_groups = ["${aws_security_group.loadBalancer_SG.id}"]
   }
 
   ingress {
@@ -117,7 +118,7 @@ resource "aws_security_group" "database_security_group" {
   description = "Allow application traffic"
 
   ingress {
-    from_port       = var.http_port
+    from_port       = var.db_port
     to_port         = var.db_port
     protocol        = var.protocol
     security_groups = ["${aws_security_group.application_security_group.id}"]
