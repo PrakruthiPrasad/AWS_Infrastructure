@@ -5,15 +5,15 @@ resource "aws_dynamodb_table" "csye6225" {
   write_capacity = 20
   hash_key       = "msg"
 
-   ttl {
+  ttl {
     attribute_name = "ttl"
     enabled        = true
-    }
+  }
 
-    attribute {
+  attribute {
     name = "msg"
     type = "S"
-    } 
+  }
 
 }
 
@@ -23,11 +23,11 @@ resource "aws_dynamodb_table" "csye6225_Email" {
   read_capacity  = 20
   write_capacity = 20
   hash_key       = "user_name"
-  
 
-    attribute {
+
+  attribute {
     name = "user_name"
     type = "S"
   }
-  
+
 }

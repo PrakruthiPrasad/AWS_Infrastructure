@@ -21,10 +21,10 @@
 // }
 
 data "archive_file" "snsFile" {
-  type = "zip"
+  type        = "zip"
   output_path = "${path.module}/lambda-1.0-SNAPSHOT.zip"
   source {
-    content = "hello"
+    content  = "hello"
     filename = "dummy.txt"
   }
 
@@ -32,21 +32,22 @@ data "archive_file" "snsFile" {
 
 resource "aws_lambda_function" "lambdaFunction" {
 
-function_name = "sns_lambda_function"
-role          = "${aws_iam_role.CodeDeployAWSLambdaRole.arn}"
-handler       = "com.neu.lambda.UserEvent::handleRequest"
-runtime       = "java11"
-filename = "${data.archive_file.snsFile.output_path}"
-timeout         = 180
-environment  {
+  function_name = "sns_lambda_function"
+  role          = aws_iam_role.CodeDeployAWSLambdaRole.arn
+  handler       = "com.neu.lambda.UserEvent::handleRequest"
+  runtime       = "java11"
+  filename      = data.archive_file.snsFile.output_path
+  timeout       = 180
+  memory_size   = 512
+  environment {
     variables = {
-    domain = var.domain
-    table  = aws_dynamodb_table.csye6225_Email.name
+      domain = var.domain
+      table  = aws_dynamodb_table.csye6225_Email.name
     }
-}
-tags = {
+  }
+  tags = {
     Name = "Lambda Email"
-}
+  }
 }
 
 resource "aws_lambda_permission" "lambda_permission_sns" {
@@ -64,9 +65,9 @@ resource "aws_sns_topic" "EmailNotification" {
 
 resource "aws_sns_topic_subscription" "sns_topic_subscription" {
   //depends_on = [aws_lambda_function.lambdaFunction]
-  topic_arn  = aws_sns_topic.EmailNotification.arn
-  protocol   = "lambda"
-  endpoint   = aws_lambda_function.lambdaFunction.arn
+  topic_arn = aws_sns_topic.EmailNotification.arn
+  protocol  = "lambda"
+  endpoint  = aws_lambda_function.lambdaFunction.arn
 }
 
 
